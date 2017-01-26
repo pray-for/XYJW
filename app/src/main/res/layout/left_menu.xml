@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#6ab8f4">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/personal"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginLeft="80dp"
+            android:background="@drawable/background"
+            android:text="个人信息"
+            android:textSize="15dp"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp">
+
+            <ImageView
+                android:id="@+id/id_img1"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/course"
+                android:layout_centerVertical="true"/>
+            <Button
+                android:id="@+id/course"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="课表查询"
+                android:textSize="20dp"
+                android:textColor="#fafafa"
+                android:background="#00fafafa"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="20dp"
+                android:layout_toRightOf="@id/id_img1"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/id_img2"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/grade"
+                android:layout_centerVertical="true"/>
+            <Button
+                android:id="@+id/grade"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="成绩查询"
+                android:textSize="20dp"
+                android:textColor="#fafafa"
+                android:background="#00fafafa"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="20dp"
+                android:layout_toRightOf="@id/id_img2"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/id_img3"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/train"
+                android:layout_centerVertical="true"/>
+            <Button
+                android:id="@+id/train"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="培养计划查询"
+                android:textSize="20dp"
+                android:textColor="#fafafa"
+                android:background="#00fafafa"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="20dp"
+                android:layout_toRightOf="@id/id_img3"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/id_img4"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/attend"
+                android:layout_centerVertical="true"/>
+            <Button
+                android:id="@+id/attend"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="考勤查询"
+                android:textSize="20dp"
+                android:textColor="#fafafa"
+                android:background="#00fafafa"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="20dp"
+                android:layout_toRightOf="@id/id_img4"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/id_img5"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/over"
+                android:layout_centerVertical="true"/>
+            <Button
+                android:id="@+id/back"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="退出"
+                android:textSize="20dp"
+                android:textColor="#fafafa"
+                android:background="#00fafafa"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="20dp"
+                android:layout_toRightOf="@id/id_img5"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
