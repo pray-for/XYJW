@@ -14,7 +14,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 /**
- * Created by J。 on 2016/4/23.
+ * Created by zhangjiawen on 2017/1/23.
  * OkHttp工具类
  */
 public class OkHttpUtil {
