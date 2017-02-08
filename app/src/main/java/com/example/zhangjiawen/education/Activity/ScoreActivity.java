@@ -1,5 +1,6 @@
 package com.example.zhangjiawen.education.Activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,18 +11,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.zhangjiawen.education.Adapter.ScoreRecyclerAdapter;
 import com.example.zhangjiawen.education.Info.CourseInfo;
 import com.example.zhangjiawen.education.R;
-import com.example.zhangjiawen.education.Adapter.ScoreRecyclerAdapter;
 
 import java.util.ArrayList;
 
 /**
  * Created by zhangjiawen on 2017/1/23.
+ * 成绩查询界面
  */
 public class ScoreActivity extends AppCompatActivity{
     private Toolbar toolbar;
-
+    private Context context;
     /**
      * 显示学年学期
      */
@@ -34,8 +36,7 @@ public class ScoreActivity extends AppCompatActivity{
         setContentView(R.layout.score_layout);
 
         initView();
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Intent intent = getIntent();
         //获取intent传递过来的List
         ArrayList<CourseInfo> courseInfoArrayList = (ArrayList<CourseInfo>) intent.getSerializableExtra("score");
@@ -67,7 +68,6 @@ public class ScoreActivity extends AppCompatActivity{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.score_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
