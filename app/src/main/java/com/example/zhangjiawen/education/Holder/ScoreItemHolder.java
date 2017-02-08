@@ -45,13 +45,6 @@ public class ScoreItemHolder extends RecyclerView.ViewHolder {
         this.textView_scoreCredit = (TextView) itemView.findViewById(R.id.textView_scoreCredit);
         this.textView_scoreAveragePoint = (TextView) itemView.findViewById(R.id.textView_scoreAveragePoint);
 
-        textView_scoreName.setText("1");
-        textView_score.setText("1");
-        textView_scoreNumber.setText("1");
-        textView_scoreNature.setText("1");
-        textView_scoreCredit.setText("1");
-        textView_scoreAveragePoint.setText("1");
-
     }
 
     public TextView getTextView_scoreName() {
