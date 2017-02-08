@@ -1,6 +1,9 @@
 package com.example.zhangjiawen.education.Activity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,11 +11,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,11 +25,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.zhangjiawen.education.Info.CourseInfo;
+import com.example.zhangjiawen.education.R;
 import com.example.zhangjiawen.education.util.JsoupService;
 import com.example.zhangjiawen.education.util.OkHttpUtil;
-import com.example.zhangjiawen.education.R;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -66,11 +75,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public String name_quanju = null;
 
+    private Context context;
+    private Map<String, String> linkMap;
+//    private Handler handler;
+    private ProgressDialog progressDialog;
+
+
+
+    public Map<String, String> getLinkMap() {
+        return linkMap;
+    }
+
+    public void setLinkMap(Map<String, String> linkMap) {
+        this.linkMap = linkMap;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mLeftMenu = (SlidingMenu) findViewById(R.id.id_menu);
+
+
+        progressDialog = new ProgressDialog(this);
 
         initView();//对控件进行初始化
         initEvent();//对点击事件进行初始化
@@ -129,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         personal.setOnClickListener(this);
         imageView_code.setOnClickListener(this);
         textView_code.setOnClickListener(this);
+
     }
 
 
@@ -147,8 +175,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this , "还没有登录\n请先登录" , Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(this , "课表查询" , Toast.LENGTH_SHORT).show();
-                    Intent intentCourse = new Intent(MainActivity.this , CourseActivity.class);
-                    startActivity(intentCourse);
+//                    Intent intent = new Intent();
+//                    intent.putExtra("name1" , name_quanju);
+//                    intent.putExtra("number1" , username.getText().toString().trim());
+//                    intent.setClass(MainActivity.this, CourseActivity.class);
+//                    MainActivity.this.startActivity(intent);
+
+                    dialogShow("正在努力读取数据...", false);
+                    Request request = OkHttpUtil.getRequest(OkHttpUtil.getREFERER() + "xskbcx.aspx?xh=" + username.getText().toString().trim() + "&xm=" + name_quanju + "&gnmkdm=N121603");
+                    OkHttpUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                        //请求失败后的回调方法
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            Message message = Message.obtain();
+                            //通过handler发送message以通知ui线程更新UI
+                            message.obj = "获取失败，请检查网络";
+                            handler.sendMessage(message);
+                            Log.v(TAG, "班级课表查询  onFailure -->  = " + e.getMessage());
+                            progressDialog.dismiss();
+                        }
+
+                        //请求成功后的回调方法
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            Message message = Message.obtain();
+                            try {
+                                if (response.code() == 200) {
+                                    String content = new String(response.body().bytes(), "gb2312");
+                                    //将请求得到的数据放入intent并跳转activity
+                                    Intent intent = new Intent();
+                                    intent.setClass(MainActivity.this, CourseActivity.class);
+                                    intent.putExtra("content", content);
+                                    MainActivity.this.startActivity(intent);
+                                } else {
+                                    message.obj = "获取失败，请检查网络";
+                                    handler.sendMessage(message);
+                                }
+                                Log.v(TAG, "班级课表查询  onResponse -->  statuscode = " + response.code());
+                            } catch (Exception e) {
+                                message.obj = "获取失败，请检查网络";
+                                handler.sendMessage(message);
+                                e.printStackTrace();
+                            } finally {
+                                progressDialog.dismiss();
+                            }
+                        }
+                    });
                 }
                 break;
             case R.id.grade:
@@ -156,8 +228,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this , "还没有登录\n请先登录" , Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(this , "成绩查询" , Toast.LENGTH_SHORT).show();
-                    Intent intentScore = new Intent(MainActivity.this , ScoreActivity.class);
-                    startActivity(intentScore);
+
+                    dialogShow("正在努力读取数据...", false);
+                    Request request_score = OkHttpUtil.getRequest(OkHttpUtil.getREFERER() + "xscjcx.aspx?xh=" + username.getText().toString().trim() + "&xm=" + name_quanju + "&gnmkdm=N121605");
+                    OkHttpUtil.getOkHttpClient().newCall(request_score).enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            Log.v(TAG, "学习成绩查询  onFailure --> " + e.getMessage());
+                            Message message = Message.obtain();
+                            message.obj = "获取失败，请检查网络";
+                            handler.sendMessage(message);
+                            progressDialog.dismiss();
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            Message message = Message.obtain();
+//                            Log.d("response.code()--------",response.code()+"");
+                            try {
+                                if (response.code() == 200) {
+                                    String content = new String(response.body().bytes(), "gb2312");
+
+                                    final Map<String, Object> map = JsoupService.getScoreYear(content);
+                                    progressDialog.dismiss();
+                                    ((Activity) MainActivity.this).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showChooseYearSemesterDialog(map);
+                                        }
+                                    });
+                                    Log.v(TAG, "学习成绩查询  onResponse --> content = " + content);
+                                } else {
+                                    message.obj = "获取失败,请检查网络连接状况";
+                                    handler.sendMessage(message);
+                                }
+                                Log.v(TAG, "学习成绩查询  onResponse --> response.code = " + response.code());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                progressDialog.dismiss();
+                                message.obj = "获取失败，请检查网络";
+                                handler.sendMessage(message);
+                            } finally {
+                                progressDialog.dismiss();
+                            }
+                        }
+                    });
                 }
                 break;
             case R.id.train:
@@ -189,14 +304,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this , "还没有登录\n请先登录" , Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(this , "显示个人信息" , Toast.LENGTH_SHORT).show();
-//                    Intent intent = new Intent();
-//                    String name1 = intent.getStringExtra("name1");
-//                    intent.putExtra("name1" , name_quanju);
-//                    intent.putExtra("number1" , username.getText().toString().trim());
-//                    intent.setClass(MainActivity.this, PersonalActivity.class);
-//                    MainActivity.this.startActivity(intent);
-                    Intent intentPersonal = new Intent(MainActivity.this , PersonalActivity.class);
-                    startActivity(intentPersonal);
+                    Intent intent = new Intent();
+                    intent.putExtra("name1" , name_quanju);
+                    intent.putExtra("number1" , username.getText().toString().trim());
+                    intent.setClass(MainActivity.this, PersonalActivity.class);
+                    MainActivity.this.startActivity(intent);
+//                    Log.d("全局姓名-----" , name_quanju);
+//                    Intent intentPersonal = new Intent(MainActivity.this , PersonalActivity.class);
+//                    startActivity(intentPersonal);
                 }
                 break;
             case R.id.imageView_code://点击图片，对验证码进行刷新
@@ -307,6 +422,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             intent.putExtra("content", content);
                             //将名字放入intent
                             intent.putExtra("name", JsoupService.isLogin(content));
+                            Log.d("content测试2------" , content);
+                            Log.d("response测试2------" , response+"");//response测试2------: Response{protocol=http/1.1, code=200, message=OK, url=http://222.24.19.201/xs_main.aspx?xh=04153162}
                             Log.d("姓名------" , JsoupService.isLogin(content));//"***同学"
                             String name1 = JsoupService.isLogin(content).substring(0 , JsoupService.isLogin(content).length()-2);
                             Log.d("姓名截取" , name1);//"***"
@@ -361,5 +478,117 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * 设置dialog状态信息并展示
+     */
+    public void dialogShow(String message, boolean cancelable) {
+        if (progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(cancelable);
+        progressDialog.show();
+    }
+
+
+    /**
+     * 显示自定义对话框并请求数据
+     *
+     * @param map 学年学期以及请求数据的集合
+     */
+    private void showChooseYearSemesterDialog(final Map<String, Object> map) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        View view = View.inflate(MainActivity.this, R.layout.score_custom_dialog, null);
+        builder.setView(view);
+        builder.setTitle("请选择要查询的学年学期");
+        /**
+         * 学年spinner适配器
+         */
+        ArrayAdapter<String> arrayAdapter_year = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, (List<String>) map.get("score_year"));
+        arrayAdapter_year.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final Spinner spinner_year = ((Spinner) view.findViewById(R.id.spinner_year));
+        spinner_year.setAdapter(arrayAdapter_year);
+        //默认选择List集合中倒数第二个
+        if (((List<String>) map.get("score_year")).size() > 1) {
+            spinner_year.setSelection(((List<String>) map.get("score_year")).size() - 2);
+        }
+        /**
+         * 学期spinner适配器
+         */
+        ArrayAdapter<String> arrayAdapter_semester = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, (List<String>) map.get("score_semester"));
+        arrayAdapter_semester.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final Spinner spinner_semester = ((Spinner) view.findViewById(R.id.spinner_semester));
+        spinner_semester.setAdapter(arrayAdapter_semester);
+        //默认选择List集合中倒数第三个
+        if (((List<String>) map.get("score_semester")).size() > 2) {
+            spinner_semester.setSelection((((List<String>) map.get("score_semester")).size() - 3));
+        }
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("__VIEWSTATE", (String) map.get("__VIEWSTATE"))
+                        .add("ddlXN", spinner_year.getSelectedItem().toString())//学年
+                        .add("ddlXQ", spinner_semester.getSelectedItem().toString())//学期
+                        .add("ddl_kcxz", "")//课程性质
+                        .add("btn_xq", "%D1%A7%C6%DA%B3%C9%BC%A8")//学期成绩
+                        .build();
+                /**
+                 * 对Referer中的中文进行编码
+                 */
+                String Referer = OkHttpUtil.encodeUrl(OkHttpUtil.getREFERER() + "xscjcx.aspx?xh=" + username.getText().toString().trim() + "&xm=" + name_quanju + "&gnmkdm=N121605");
+
+                //     http://222.24.19.201/xscjcx.aspx?xh=04153162&xm=%D5%C5%BC%CE%F6%A9&gnmkdm=N121605
+                Request request = OkHttpUtil.getRequest(Referer, Referer, requestBody);
+                dialogShow("正在努力读取数据...", false);
+                OkHttpUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.v(TAG, "学习成绩查询  --> onFailure  --> " + e.getMessage());
+                        progressDialog.dismiss();
+                        dialog.dismiss();
+                        Message message = Message.obtain();
+                        message.obj = "获取失败，请检查网络";
+                        handler.sendMessage(message);
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        Message message = Message.obtain();
+                        try {
+                            if (response.code() == 200) {
+                                String content = new String(response.body().bytes(), "gb2312");
+                                ArrayList<CourseInfo> courseInfoArrayList = JsoupService.parseCourseScore(content);
+                                Intent intent = new Intent();
+                                intent.setClass(MainActivity.this, ScoreActivity.class);
+                                intent.putExtra("score", courseInfoArrayList);
+                                intent.putExtra("year", spinner_year.getSelectedItem().toString());
+                                intent.putExtra("semester", spinner_semester.getSelectedItem().toString());
+                                MainActivity.this.startActivity(intent);
+                            } else {
+                                message.obj = "获取失败，请检查网络";
+                                handler.sendMessage(message);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            message.obj = "获取失败，请检查网络";
+                            handler.sendMessage(message);
+                        } finally {
+                            progressDialog.dismiss();
+                        }
+                        Log.v(TAG, "学习成绩查询  --> onResponse  --> response.code = " + response.code());
+                    }
+                });
+            }
+
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
 
 }
