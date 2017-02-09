@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -25,6 +26,7 @@ import okhttp3.Response;
 
 /**
  * Created by zhangjiawen on 2017/1/23.
+ * 个人信息界面
  */
 public class PersonalActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -42,14 +44,12 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.personal_layout);
         mLeftMenu = (SlidingMenu) findViewById(R.id.id_menu);
-//        back = (Button) findViewById(R.id.back);
 
-//        List<Map<String, Object>> list = new ArrayList<>();
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("title", "个人信息");
-//        map.put("icon", R.drawable.user);
-//        list.add(map);
-//        SimpleAdapter simpleAdapter = new SimpleAdapter(PersonalActivity.this, list, R.layout.drawer_menu_item, new String[]{"title", "icon"}, new int[]{R.id.drawer_menu_title, R.id.drawer_menu_icon});
+        this.toolbar = (Toolbar) findViewById(R.id.main_toolbar_back);
+        toolbar.setTitle("西邮教务");
+        toolbar.setSubtitle("个人信息");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initView();
         personalAdapter = new PersonalAdapter(this);
@@ -57,20 +57,19 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void initView() {
-        toolbar = (Toolbar) findViewById(R.id.main_toolbar_back);
         listView = (ListView) findViewById(R.id.personal_listView);
     }
 
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                this.finish();
-//                break;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     /**
      * 初始化数据
@@ -99,6 +98,8 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String content = new String(response.body().bytes(), "gb2312");
+//                Log.d("AAAAAAAAAA" , response+"");
+//                Log.d("content测试---Personal" , content);
                 map = JsoupService.parsePersonInfo(content);
                 //将数据传递到适配器
                 personalAdapter.setMap(map);
