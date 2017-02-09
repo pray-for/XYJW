@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.Button;
 
 import com.example.zhangjiawen.education.R;
@@ -14,10 +14,9 @@ import com.example.zhangjiawen.education.util.JsoupService;
  * Created by zhangjiawen on 2017/1/17.
  * 课表查询界面
  */
-public class CourseActivity extends AppCompatActivity implements View.OnClickListener {
+public class CourseActivity extends AppCompatActivity  {
 
     private SlidingMenu mLeftMenu;//左边侧滑栏
-    private Button back;//标题栏上的返回键
     private Toolbar toolbar;
 
     private int[][] btn_id = {{R.id.course_1_1, R.id.course_1_2, R.id.course_1_3, R.id.course_1_4, R.id.course_1_5, R.id.course_1_6, R.id.course_1_7},
@@ -44,6 +43,12 @@ public class CourseActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.course_layout);
         mLeftMenu = (SlidingMenu) findViewById(R.id.id_menu);
 
+        this.toolbar = (Toolbar) findViewById(R.id.main_toolbar_back);
+        toolbar.setTitle("西邮教务");
+        toolbar.setSubtitle("课表");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         Intent intent = getIntent();
         String response = intent.getStringExtra("content");
@@ -64,23 +69,14 @@ public class CourseActivity extends AppCompatActivity implements View.OnClickLis
     }
 
 
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                this.finish();
-//                break;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
     @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.back:
-                finish();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
                 break;
         }
+        return super.onOptionsItemSelected(item);
     }
+
 }
