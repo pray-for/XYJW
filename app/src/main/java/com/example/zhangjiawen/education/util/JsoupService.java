@@ -126,8 +126,6 @@ public class JsoupService {
         Document document = Jsoup.parse(content);
         Elements elements = document.select("input[name=__VIEWSTATE]");
         map.put("__VIEWSTATE", elements.get(0).val());
-       /* elements = document.select("input[name=__VIEWSTATEGENERATOR]");
-        map.put("__VIEWSTATEGENERATOR", elements.get(0).val());*/
         elements = document.select("select[name=ddlXN] option");
         List<String> score_year = new ArrayList<>();
         for (Element element : elements) {
@@ -151,18 +149,6 @@ public class JsoupService {
      */
     public static ArrayList<CourseInfo> parseCourseScore(String content) {
         Document document = Jsoup.parse(content);
-
-//        Element element = document.getElementById("Datagrid1");
-//        ArrayList<CourseInfo> courseInfoArrayList = new ArrayList<>();
-//        if (element != null) {
-//            Elements elements = element.getElementsByTag("tr");
-//            elements.remove(0);
-//            for (int i = 1; i < elements.size(); i++){
-//                Elements elements1 = elements.get(i).getAllElements();
-//                CourseInfo courseInfo = new CourseInfo();
-//            }
-//        }
-
         Elements elements = document.select("table#Datagrid1.datelist tr");
         //移除无效项
         elements.remove(0);
@@ -233,9 +219,67 @@ public class JsoupService {
         map.put("专业" , major.text());
         map.put("班级" , classes.text());
         Log.d("学号+姓名+院+专业" , number.text() + "---" + name.text() + "---" +college.text() +"---" + major.text());
-
         return map;
     }
+
+    /**
+     * 获取学年学期以及请求参数
+     * 进入培养计划界面
+     * @param content html源代码
+     * @return 存储学年学期请求参数的map集合
+     */
+    public static Map<String, Object> getScoreYearTrain(String content) {
+        Map<String, Object> map = new HashMap<>();
+        Document document = Jsoup.parse(content);
+        Elements elements = document.select("input[name=__VIEWSTATE]");
+        map.put("__VIEWSTATE", elements.get(0).val());
+        elements = document.select("select[name=xq] option");
+        List<String> score_semester = new ArrayList<>();
+        for (Element element : elements) {
+            score_semester.add(element.val());
+        }
+        map.put("score_semester", score_semester);
+        return map;
+    }
+
+
+    /**
+     * 解析培养计划
+     * @return 需要学习的课程信息
+     */
+    public static ArrayList<CourseInfo> parseTrain(String content) {
+        Document document = Jsoup.parse(content);
+        Elements elements = document.select("table#DBGrid.datelist tr");
+        //移除无效项
+        elements.remove(0);
+        ArrayList<CourseInfo> courseInfoArrayList = new ArrayList<>();
+
+        for (Element element : elements) {
+            Elements elements1 = element.select("td");
+            CourseInfo courseInfo = new CourseInfo();
+            //赋值学年
+//            courseInfo.setYear(elements1.get(0).text());
+            //赋值学期
+            courseInfo.setSemester(elements1.get(1).text());
+            //赋值课程代码
+            courseInfo.setCourse_code(elements1.get(0).text());
+            //赋值课程名称
+            courseInfo.setCourse_name(elements1.get(1).text());
+            //赋值课程性质
+            courseInfo.setCourse_nature(elements1.get(5).text());
+            //赋值课程归属
+            courseInfo.setCourse_belong(elements1.get(5).text());
+            //赋值课程学分
+            courseInfo.setCourse_credit(elements1.get(2).text());
+
+
+            //添加到集合
+            courseInfoArrayList.add(courseInfo);
+        }
+        return courseInfoArrayList;
+    }
+
+
 
 
     public static Map<String, String> getLinkMap() {
