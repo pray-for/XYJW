@@ -52,6 +52,10 @@ public class ScoreActivity extends AppCompatActivity{
 
     private void initView() {
         this.toolbar = (Toolbar) findViewById(R.id.main_toolbar_back);
+        toolbar.setTitle("西邮教务");
+        toolbar.setSubtitle("成绩");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.textView_score_header = (TextView) findViewById(R.id.textView_score_header);
         this.recyclerView_score = (RecyclerView) findViewById(R.id.recyclerView_score);
     }
