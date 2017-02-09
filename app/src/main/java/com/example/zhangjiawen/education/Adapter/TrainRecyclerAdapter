@@ -1,0 +1,54 @@
+package com.example.zhangjiawen.education.Adapter;
+
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
+import com.example.zhangjiawen.education.Holder.TrainItemHolder;
+import com.example.zhangjiawen.education.Info.CourseInfo;
+import com.example.zhangjiawen.education.R;
+
+import java.util.ArrayList;
+
+/**
+ * Created by zhangjiawen on 2017/2/8.
+ */
+public class TrainRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+
+    private Context context;
+    private LayoutInflater layoutInflater;
+
+    /**
+     * 存放课程成绩信息实体的集合
+     */
+    private ArrayList<CourseInfo> courseInfoArrayList;
+
+    public TrainRecyclerAdapter(Context context, ArrayList<CourseInfo> courseInfoArrayList) {
+        this.context = context;
+        this.layoutInflater = LayoutInflater.from(context);
+        this.courseInfoArrayList = courseInfoArrayList;
+    }
+
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        TrainItemHolder trainItemHolder = new TrainItemHolder(layoutInflater.inflate(R.layout.train_item_layout, parent, false));
+        return trainItemHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        //从list集合中取出数据绑定到view
+        ((TrainItemHolder) holder).getTextView_scoreName_train().setText(courseInfoArrayList.get(position).getCourse_name());
+        ((TrainItemHolder) holder).getTextView_scoreNumber_train().setText(courseInfoArrayList.get(position).getCourse_code());
+        ((TrainItemHolder) holder).getTextView_scoreCredit_train().setText(courseInfoArrayList.get(position).getCourse_credit());
+        ((TrainItemHolder) holder).getTextView_scoreNature_train().setText(courseInfoArrayList.get(position).getCourse_nature());
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return courseInfoArrayList.size();
+    }
+}
