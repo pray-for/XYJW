@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Context context;
     private Map<String, String> linkMap;
-//    private Handler handler;
     private ProgressDialog progressDialog;
 
 
@@ -175,12 +174,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this , "还没有登录\n请先登录" , Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(this , "课表查询" , Toast.LENGTH_SHORT).show();
-//                    Intent intent = new Intent();
-//                    intent.putExtra("name1" , name_quanju);
-//                    intent.putExtra("number1" , username.getText().toString().trim());
-//                    intent.setClass(MainActivity.this, CourseActivity.class);
-//                    MainActivity.this.startActivity(intent);
-
                     dialogShow("正在努力读取数据...", false);
                     Request request = OkHttpUtil.getRequest(OkHttpUtil.getREFERER() + "xskbcx.aspx?xh=" + username.getText().toString().trim() + "&xm=" + name_quanju + "&gnmkdm=N121603");
                     OkHttpUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
@@ -228,7 +221,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this , "还没有登录\n请先登录" , Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(this , "成绩查询" , Toast.LENGTH_SHORT).show();
-
                     dialogShow("正在努力读取数据...", false);
                     Request request_score = OkHttpUtil.getRequest(OkHttpUtil.getREFERER() + "xscjcx.aspx?xh=" + username.getText().toString().trim() + "&xm=" + name_quanju + "&gnmkdm=N121605");
                     OkHttpUtil.getOkHttpClient().newCall(request_score).enqueue(new Callback() {
@@ -248,7 +240,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             try {
                                 if (response.code() == 200) {
                                     String content = new String(response.body().bytes(), "gb2312");
-
                                     final Map<String, Object> map = JsoupService.getScoreYear(content);
                                     progressDialog.dismiss();
                                     ((Activity) MainActivity.this).runOnUiThread(new Runnable() {
@@ -280,6 +271,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this , "还没有登录\n请先登录" , Toast.LENGTH_SHORT).show();
                 }else {
                     Toast.makeText(this , "培养计划查询" , Toast.LENGTH_SHORT).show();
+//                    RequestBody requestBody = new FormBody.Builder()
+//                            .add("__VIEWSTATE" , "dDwtNTE2MjI4MTQ7Oz61IGQDPAm6cyppI+uTzQcI8sEH6Q==")
+//                            .add("xq" , "4")
+//                            .add("kcxz" , "%C8%AB%B2%BF")
+//                            .add("Button1" , "%BF%C9%CC%E6%BB%BB%BF%CE%B3%CC")
+//                            .add("dpDBGrid:txtChoosePage" , "1")
+//                            .add("dpDBGrid:txtPageSize" , "20")
+//                            .build();
+                    Request request = OkHttpUtil.getRequest(OkHttpUtil.getREFERER() + "pyjh.aspx?xh=" + username.getText().toString().trim() + "&xm=" + name_quanju + "&gnmkdm=N121607");
+                    OkHttpUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            Log.v(TAG, "培养计划查询  onFailure --> " + e.getMessage());
+                            Message message = Message.obtain();
+                            message.obj = "获取失败，请检查网络";
+                            handler.sendMessage(message);
+                            progressDialog.dismiss();
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            Message message = Message.obtain();
+                            try {
+                                if (response.code() == 200) {
+                                    String content = new String(response.body().bytes(), "gb2312");
+                                    final Map<String, Object> map = JsoupService.getScoreYearTrain(content);
+                                    progressDialog.dismiss();
+                                    ((Activity) MainActivity.this).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showChooseYearSemesterDialogTrain(map);
+                                        }
+                                    });
+                                    Log.v(TAG, "培养计划查询  onResponse --> content = " + content);
+                                } else {
+                                    message.obj = "获取失败,请检查网络连接状况";
+                                    handler.sendMessage(message);
+                                }
+                                Log.v(TAG, "培养计划查询  onResponse --> response.code = " + response.code());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                progressDialog.dismiss();
+                                message.obj = "获取失败，请检查网络";
+                                handler.sendMessage(message);
+                            } finally {
+                                progressDialog.dismiss();
+                            }
+                        }
+                    });
                 }
                 break;
             case R.id.attend:
@@ -309,9 +349,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     intent.putExtra("number1" , username.getText().toString().trim());
                     intent.setClass(MainActivity.this, PersonalActivity.class);
                     MainActivity.this.startActivity(intent);
-//                    Log.d("全局姓名-----" , name_quanju);
-//                    Intent intentPersonal = new Intent(MainActivity.this , PersonalActivity.class);
-//                    startActivity(intentPersonal);
                 }
                 break;
             case R.id.imageView_code://点击图片，对验证码进行刷新
@@ -493,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * 显示自定义对话框并请求数据
-     *
+     * 进入成绩查询的页面
      * @param map 学年学期以及请求数据的集合
      */
     private void showChooseYearSemesterDialog(final Map<String, Object> map) {
@@ -577,6 +614,104 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             progressDialog.dismiss();
                         }
                         Log.v(TAG, "学习成绩查询  --> onResponse  --> response.code = " + response.code());
+                    }
+                });
+            }
+
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    /**
+     * 显示自定义对话框并请求数据
+     * 进入培养计划查询的页面
+     * @param map 学年学期以及请求数据的集合
+     */
+    private void showChooseYearSemesterDialogTrain(final Map<String, Object> map) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        View view = View.inflate(MainActivity.this, R.layout.score_custom_dialog, null);
+        builder.setView(view);
+        builder.setTitle("请选择要查询的学年学期");
+//        /**
+//         * 学年spinner适配器
+//         */
+//        ArrayAdapter<String> arrayAdapter_year = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, (List<String>) map.get("score_year"));
+//        arrayAdapter_year.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        final Spinner spinner_year = ((Spinner) view.findViewById(R.id.spinner_year));
+//        spinner_year.setAdapter(arrayAdapter_year);
+//        //默认选择List集合中倒数第二个
+//        if (((List<String>) map.get("score_year")).size() > 1) {
+//            spinner_year.setSelection(((List<String>) map.get("score_year")).size() - 2);
+//        }
+        /**
+         * 学期spinner适配器
+         */
+        ArrayAdapter<String> arrayAdapter_semester = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, (List<String>) map.get("score_semester"));
+        arrayAdapter_semester.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final Spinner spinner_semester = ((Spinner) view.findViewById(R.id.spinner_semester));
+        spinner_semester.setAdapter(arrayAdapter_semester);
+        //默认选择List集合中第一个
+        if (((List<String>) map.get("score_semester")).size() > 2) {
+            spinner_semester.setSelection((((List<String>) map.get("score_semester")).size() - 8));
+        }
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int which) {
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("__VIEWSTATE", (String) map.get("__VIEWSTATE"))
+                        .add("xq" , spinner_semester.getSelectedItem().toString())
+                        .add("kcxz" , "%C8%AB%B2%BF")
+                        .add("Button1" , "%BF%C9%CC%E6%BB%BB%BF%CE%B3%CC")
+                        .add("dpDBGrid:txtChoosePage" , "1")
+                        .add("dpDBGrid:txtPageSize" , "20")
+                        .build();
+                /**
+                 * 对Referer中的中文进行编码
+                 */
+                String Referer = OkHttpUtil.encodeUrl(OkHttpUtil.getREFERER() + "pyjh.aspx?xh=" + username.getText().toString().trim() + "&xm=" + name_quanju + "&gnmkdm=N121607");
+                Request request = OkHttpUtil.getRequest(Referer, Referer, requestBody);
+                dialogShow("正在努力读取数据...", false);
+                OkHttpUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.v(TAG, "培养计划查询  --> onFailure  --> " + e.getMessage());
+                        progressDialog.dismiss();
+                        dialog.dismiss();
+                        Message message = Message.obtain();
+                        message.obj = "获取失败，请检查网络";
+                        handler.sendMessage(message);
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        Message message = Message.obtain();
+                        try {
+                            if (response.code() == 200) {
+                                String content = new String(response.body().bytes(), "gb2312");
+                                ArrayList<CourseInfo> courseInfoArrayList = JsoupService.parseTrain(content);
+                                Intent intent = new Intent();
+                                intent.setClass(MainActivity.this, TrainActivity.class);
+                                intent.putExtra("score", courseInfoArrayList);
+                                intent.putExtra("semester", spinner_semester.getSelectedItem().toString());
+                                MainActivity.this.startActivity(intent);
+                            } else {
+                                message.obj = "获取失败，请检查网络";
+                                handler.sendMessage(message);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            message.obj = "获取失败，请检查网络";
+                            handler.sendMessage(message);
+                        } finally {
+                            progressDialog.dismiss();
+                        }
+                        Log.v(TAG, "培养计划查询  --> onResponse  --> response.code = " + response.code());
                     }
                 });
             }
