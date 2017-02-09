@@ -14,4 +14,13 @@
         android:layout_height="30dp"
         android:background="@drawable/more"/>
 
+    <TextView
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="30dp"
+        android:text="西邮教务系统"
+        android:textColor="#fafafa"
+        android:textSize="20dp"
+        android:gravity="center"/>
+
 </android.support.v7.widget.Toolbar>
